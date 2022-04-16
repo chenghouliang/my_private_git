@@ -1,0 +1,61 @@
+/* Copyright (C) 2015 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+package commonapi.examples
+
+interface ModuleXXX {
+    version { major 0 minor 1 }
+
+    attribute Int32 x
+    attribute ModuleXXXCommonTypes.a1Struct a1
+
+    method sayHello {
+        in {
+            String name
+        }
+        out {
+            String message
+        }
+    }
+    
+    method foo {
+        in {
+            Int32 x1
+            String x2
+        }
+        out {
+            Int32 y1
+            String y2
+        }
+        error stdErrorTypeEnum
+    }
+
+    broadcast myStatus {
+        out {
+            Int32 myCurrentValue
+        }
+    }
+
+    enumeration stdErrorTypeEnum {
+        NO_FAULT
+        MY_FAULT
+    }
+}
+
+
+typeCollection ModuleXXXCommonTypes {
+    version { major 0 minor 1 }
+    
+    struct a1Struct {
+        String s
+        a2Struct a2
+    }
+
+    struct a2Struct {
+        Int32 a
+        Boolean b
+        Double d
+    }
+}
