@@ -16,6 +16,10 @@ OPTION(USE_CONSOLE "Set to OFF to disable console logging" OFF )
 message(STATUS "USE_CONSOLE is set to value: ${USE_CONSOLE}")
 set(COMMONAPI_INCLUDE_DIRS "/home/chenghl/CommonAPI/capicxx-core-runtime/include")
 set(COMMONAPI_SOMEIP_INCLUDE_DIRS "/home/chenghl/CommonAPI/capicxx-someip-runtime/include")
+set(CMAKE_C_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-gcc")
+set(CMAKE_CXX_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-g++")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
 
 IF(USE_FILE)
   add_definitions(-DUSE_FILE)
@@ -82,6 +86,7 @@ find_package (CommonAPI-SomeIP 3.2.0 REQUIRED)
 find_package (vsomeip3 3.1.20 REQUIRED)
 
 # Source Files
+set(PRJ_APP_PATH demo_app)
 set(PRJ_SRC_PATH src)
 set(PRJ_SRC_GEN_PATH src-gen)
 set(PRJ_SRC_GEN_COMMONAPI_PATH ${PRJ_SRC_GEN_PATH}/v0/commonapi/examples)
@@ -94,8 +99,8 @@ set(PRJ_NAME_SERVICE ${PRJ_NAME}Service)
 
 # Application
 FILE(GLOB PRJ_PROXY_GEN_SRCS ${PRJ_SRC_GEN_COMMONAPI_PATH}/*.cpp)
-set(PRJ_CLIENT_SRCS ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-set(PRJ_SERVICE_SRCS ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+set(PRJ_CLIENT_SRCS ${PRJ_APP_PATH}/${PRJ_NAME_CLIENT}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+set(PRJ_SERVICE_SRCS ${PRJ_APP_PATH}/${PRJ_NAME_SERVICE}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
 
 # Boost
 find_package( Boost 1.54 COMPONENTS system thread log REQUIRED )
@@ -167,8 +172,8 @@ target_link_libraries(${PRJ_NAME_SERVICE} vsomeip3)
 #add_library (${PRJ_NAME}-someip SHARED ${PRJ_SOMEIP_LIB_SRCS})
 #target_link_libraries(${PRJ_NAME}-someip CommonAPI-SomeIP)
 
-add_library (${PRJ_NAME_CLIENT}-someip SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+add_library (${PRJ_NAME_CLIENT}_api SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
 target_link_libraries(${PRJ_NAME_CLIENT} CommonAPI-SomeIP)
 
-add_library (${PRJ_NAME_SERVICE}-someip SHARED ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+add_library (${PRJ_NAME_SERVICE}_api SHARED ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
 target_link_libraries(${PRJ_NAME_SERVICE} CommonAPI-SomeIP)
