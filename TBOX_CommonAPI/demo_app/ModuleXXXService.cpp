@@ -6,23 +6,24 @@
 #include <iostream>
 #include <thread>
 
-#include <CommonAPI/CommonAPI.hpp>
 #include "ModuleXXXServiceImpl.hpp"
 #include "string.h"
 
-//using namespace std;
-
 void sayHello(char *name, char *returnMessage)
 {
-    std::cout << "Hello, sayHello-->ChengHouliang" << std::endl;
+    memcpy((void *)returnMessage, (void *)name, strlen(name)+1);
+    //printf("server:%s->%s\n", name, returnMessage);
 }
 
-void funxxx(int x1, char *x2, int *ret_y1, char *ret_y2)
+void fun_array_test(uint8_t *name, uint8_t *returnMessage)
 {
-    static int i = 0;
-    *ret_y1 = i++;
-    std::cout << "Hello, funxxx-->ChengHouliang" << std::endl;
-    //strcpy(ret_y2, "Hello, funxxx-->ChengHouliang");
+    memcpy((void *)returnMessage, (void *)name, 100);
+    //printf("server:%s->%s\n", name, returnMessage);
+}
+
+void funxxx(int x, int *ret_y)
+{
+    *ret_y = x*x;
 }
 
 int main() 
@@ -31,11 +32,11 @@ int main()
     module_xxx_register_server();
     module_xxx_sayHello_callback_register(sayHello);
     module_xxx_funxxx_callback_register(funxxx);
+    module_xxx_fun_array_test_callback_register(fun_array_test);
     while (true) 
     {
         module_xxx_evtxxx_broadcast(cnt++);
-        std::cout << "Waiting for calls... (Abort with CTRL+C)" << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        usleep(1000);
     }
 
     return 0;

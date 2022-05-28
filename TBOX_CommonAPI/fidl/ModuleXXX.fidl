@@ -7,7 +7,7 @@ package commonapi.examples
 
 interface ModuleXXX {
     version { major 0 minor 1 }
-
+    array myArray of UInt8
     attribute Int32 x
     attribute ModuleXXXCommonTypes.a1Struct a1
 
@@ -20,18 +20,26 @@ interface ModuleXXX {
         }
     }
     
-    method foo {
+    method funxxx {
         in {
-            Int32 x1
-            String x2
+            Int32 x
         }
         out {
-            Int32 y1
-            String y2
+            Int32 y
         }
         error stdErrorTypeEnum
     }
 
+    method fun_array_test {
+        in {
+            myArray x_array
+        }
+        out {
+            myArray y_array
+        }
+        error stdErrorTypeEnum_array
+    }
+    
     broadcast myStatus {
         out {
             Int32 myCurrentValue
@@ -39,6 +47,11 @@ interface ModuleXXX {
     }
 
     enumeration stdErrorTypeEnum {
+        NO_FAULT
+        MY_FAULT
+    }
+
+    enumeration stdErrorTypeEnum_array {
         NO_FAULT
         MY_FAULT
     }

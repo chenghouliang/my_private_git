@@ -4,17 +4,21 @@
     {
         "level" : "debug",
         "console" : "true",
-        "file" : { "enable" : "false", "path" : "/var/log/vsomeip.log" },
+        "file" : { "enable" : "true", "path" : "/var/log/vsomeip.log" },
         "dlt" : "false"
     },
     "applications" :
     [
         {
-            "name" : "client-sample",
+            "name" : "ModuleXXX_Client_ModuleA",
+            "id" : "0x1342"
+        },
+        {
+            "name" : "ModuleXXX_Client_ModuleB",
             "id" : "0x1343"
         },
         {
-            "name" : "service-sample",
+            "name" : "ModuleXXX_Service",
             "id" : "0x1277"
         }
     ],
@@ -27,7 +31,7 @@
             "unreliable" : "31000"
         }
     ],
-    "routing" : "service-sample",
+    "routing" : "ModuleXXX_Service",
     "service-discovery" :
     {
         "enable" : "true",

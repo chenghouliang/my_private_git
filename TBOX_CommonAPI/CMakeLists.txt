@@ -16,8 +16,8 @@ OPTION(USE_CONSOLE "Set to OFF to disable console logging" OFF )
 message(STATUS "USE_CONSOLE is set to value: ${USE_CONSOLE}")
 set(COMMONAPI_INCLUDE_DIRS "/home/chenghl/CommonAPI/capicxx-core-runtime/include")
 set(COMMONAPI_SOMEIP_INCLUDE_DIRS "/home/chenghl/CommonAPI/capicxx-someip-runtime/include")
-set(CMAKE_C_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-gcc")
-set(CMAKE_CXX_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-g++")
+#set(CMAKE_C_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-gcc")
+#set(CMAKE_CXX_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-g++")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
 
@@ -93,13 +93,14 @@ set(PRJ_SRC_GEN_COMMONAPI_PATH ${PRJ_SRC_GEN_PATH}/v0/commonapi/examples)
 set(PRJ_SRC_GEN_COMMONAPI_DBUS_PATH ${PRJ_SRC_GEN_PATH}/v0/commonapi/examples)
 set(PRJ_SRC_GEN_COMMONAPI_SOMEIP_PATH ${PRJ_SRC_GEN_PATH}/v0/commonapi/examples)
 
-
 set(PRJ_NAME_CLIENT ${PRJ_NAME}Client)
 set(PRJ_NAME_SERVICE ${PRJ_NAME}Service)
-
+set(PRJ_NAME_CLIENT_A ${PRJ_NAME_CLIENT}ModuleA)
+set(PRJ_NAME_CLIENT_B ${PRJ_NAME_CLIENT}ModuleB)
 # Application
 FILE(GLOB PRJ_PROXY_GEN_SRCS ${PRJ_SRC_GEN_COMMONAPI_PATH}/*.cpp)
-set(PRJ_CLIENT_SRCS ${PRJ_APP_PATH}/${PRJ_NAME_CLIENT}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+set(PRJ_CLIENT_SRCS_A ${PRJ_APP_PATH}/${PRJ_NAME_CLIENT_A}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+set(PRJ_CLIENT_SRCS_B ${PRJ_APP_PATH}/${PRJ_NAME_CLIENT_B}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
 set(PRJ_SERVICE_SRCS ${PRJ_APP_PATH}/${PRJ_NAME_SERVICE}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
 
 # Boost
@@ -151,11 +152,18 @@ else()
 endif()
 
 # Build Client
-add_executable(${PRJ_NAME_CLIENT} ${PRJ_CLIENT_SRCS})
-#target_link_libraries(${PRJ_NAME_CLIENT} ${LINK_LIBRARIES})
-target_link_libraries(${PRJ_NAME_CLIENT} CommonAPI)
-target_link_libraries(${PRJ_NAME_CLIENT} CommonAPI-SomeIP)
-target_link_libraries(${PRJ_NAME_CLIENT} vsomeip3)
+add_executable(${PRJ_NAME_CLIENT_A} ${PRJ_CLIENT_SRCS_A})
+#target_link_libraries(${PRJ_NAME_CLIENT_A} ${LINK_LIBRARIES})
+target_link_libraries(${PRJ_NAME_CLIENT_A} CommonAPI)
+target_link_libraries(${PRJ_NAME_CLIENT_A} CommonAPI-SomeIP)
+target_link_libraries(${PRJ_NAME_CLIENT_A} vsomeip3)
+
+# Build Client
+add_executable(${PRJ_NAME_CLIENT_B} ${PRJ_CLIENT_SRCS_B})
+#target_link_libraries(${PRJ_NAME_CLIENT_B} ${LINK_LIBRARIES})
+target_link_libraries(${PRJ_NAME_CLIENT_B} CommonAPI)
+target_link_libraries(${PRJ_NAME_CLIENT_B} CommonAPI-SomeIP)
+target_link_libraries(${PRJ_NAME_CLIENT_B} vsomeip3)
 
 # Build service
 add_executable(${PRJ_NAME_SERVICE} ${PRJ_SERVICE_SRCS})
@@ -172,8 +180,8 @@ target_link_libraries(${PRJ_NAME_SERVICE} vsomeip3)
 #add_library (${PRJ_NAME}-someip SHARED ${PRJ_SOMEIP_LIB_SRCS})
 #target_link_libraries(${PRJ_NAME}-someip CommonAPI-SomeIP)
 
-add_library (${PRJ_NAME_CLIENT}_api SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-target_link_libraries(${PRJ_NAME_CLIENT} CommonAPI-SomeIP)
+#add_library (${PRJ_NAME_CLIENT}_api SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+#target_link_libraries(${PRJ_NAME_CLIENT} CommonAPI-SomeIP)
 
-add_library (${PRJ_NAME_SERVICE}_api SHARED ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-target_link_libraries(${PRJ_NAME_SERVICE} CommonAPI-SomeIP)
+#add_library (${PRJ_NAME_SERVICE}_api SHARED ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+#target_link_libraries(${PRJ_NAME_SERVICE} CommonAPI-SomeIP)

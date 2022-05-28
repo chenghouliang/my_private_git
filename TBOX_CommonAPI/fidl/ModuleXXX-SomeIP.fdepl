@@ -37,24 +37,17 @@ define org.genivi.commonapi.someip.deployment for interface commonapi.examples.M
             }
         }
     }
-
     
-    method foo {
+    method funxxx {
         SomeIpMethodID = 30005
         SomeIpReliable = false
-        
-        in {
-            x2 {
-                SomeIpStringEncoding = utf16le
-            }
-        }
-        out {
-            y2 {
-                SomeIpStringEncoding = utf16le
-            }
-        }
     }
-    
+
+    method fun_array_test {
+        SomeIpMethodID = 30006
+        SomeIpReliable = false
+    }
+
     broadcast myStatus {
         SomeIpEventID = 33012        
         SomeIpEventGroups = { 33012 }

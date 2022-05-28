@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <iostream>
 #include <string>
-
+#include <cstring>
 #ifndef _WIN32
 #include <unistd.h>
 #endif
@@ -18,6 +18,7 @@ using namespace v0_1::commonapi::examples;
 
 module_xxx_sayHello_cb_f module_xxx_sayHello_handle = NULL;
 module_xxx_funxxx_cb_f module_xxx_funxxx_handle = NULL;
+module_xxx_fun_array_test_cb_f module_xxx_fun_array_test_handle = NULL;
 
 class ModuleXXXStubImpl: public v0_1::commonapi::examples::ModuleXXXStubDefault 
 {
@@ -25,10 +26,10 @@ class ModuleXXXStubImpl: public v0_1::commonapi::examples::ModuleXXXStubDefault
         ModuleXXXStubImpl();
         virtual ~ModuleXXXStubImpl();
 
-        virtual void sayHello(const std::shared_ptr<CommonAPI::ClientId> _client, std::string _name, sayHelloReply_t _return);
-        virtual void foo(const std::shared_ptr<CommonAPI::ClientId> _client,
-                int32_t _x1, std::string _x2,
-                fooReply_t _reply);
+        virtual void sayHello(const std::shared_ptr<CommonAPI::ClientId> _client, std::string _name, sayHelloReply_t _reply);
+        virtual void funxxx(const std::shared_ptr<CommonAPI::ClientId> _client, int32_t _x, funxxxReply_t _reply);
+        virtual void fun_array_test(const std::shared_ptr<CommonAPI::ClientId> _client, std::vector< uint8_t> _x, fun_array_testReply_t _reply);
+
 };
 
 ModuleXXXStubImpl::ModuleXXXStubImpl() {
@@ -44,47 +45,66 @@ void ModuleXXXStubImpl::sayHello(const std::shared_ptr<CommonAPI::ClientId> _cli
 
     if (module_xxx_sayHello_handle != NULL)
     {
-        char name[20],returnMessage[20];
-        //strcpy(name, _name.c_str);
-        //strlen(y2, ret_y2, strlen(ret_y2));
+        char returnMessage[20];
+        char name[100];
+        strcpy(name, _name.c_str());
         module_xxx_sayHello_handle(name, returnMessage);
-        //messageStream << "Hello " << returnMessage << "!";
-        messageStream << "Hello ok"<< "!";
+        messageStream << returnMessage;
     }
     else
     {
-        messageStream << "Hello error" << _name << "!";
-        std::cout << "sayHello error '" <<"'\n";
+        std::cout << "sayHello call faile" <<"'\n";
     }
     _reply(messageStream.str());
-};
+}
 
-void ModuleXXXStubImpl::foo(const std::shared_ptr<CommonAPI::ClientId> _client,
-                int32_t _x1, std::string _x2,
-                fooReply_t _reply) 
+void ModuleXXXStubImpl::fun_array_test(const std::shared_ptr<CommonAPI::ClientId> _client,
+                std::vector< uint8_t> _x, fun_array_testReply_t _reply) 
 {
+    ModuleXXX::stdErrorTypeEnum_array methodError = ModuleXXX::stdErrorTypeEnum_array::MY_FAULT;
+    std::vector< uint8_t> ret_y(100);
+    uint8_t in_array[100], out_array[100];
+    int i = 0;
+    if (module_xxx_fun_array_test_handle != NULL)
+    {
+        for(i = 0; i < 100; i++)
+        {
+            in_array[i] = _x[i];
+        }
 
-    std::cout << "foo called, setting new values." << std::endl;
+        module_xxx_fun_array_test_handle(in_array, out_array);
+        methodError = ModuleXXX::stdErrorTypeEnum_array::NO_FAULT;
 
+        for(i = 0; i < 100; i++)
+        {
+            ret_y[i] = out_array[i];
+        }
+    }
+    else
+    {
+        std::cout << "fun_array_test call failed" <<"'\n";
+    }
+
+    _reply(methodError, ret_y);
+}
+
+void ModuleXXXStubImpl::funxxx(const std::shared_ptr<CommonAPI::ClientId> _client,
+                int32_t _x, funxxxReply_t _reply) 
+{
     ModuleXXX::stdErrorTypeEnum methodError = ModuleXXX::stdErrorTypeEnum::MY_FAULT;
-    int32_t y1 = 42;
-    std::string y2 = "xyz";
+    int32_t ret_y = 0;
 
     if (module_xxx_funxxx_handle != NULL)
     {
-        int x1, ret_y1;
-        char x2[20], ret_y2[20];
-        module_xxx_funxxx_handle(x1, x2, &ret_y1, ret_y2);
-        y1 = ret_y1;
-        //y2 <<ret_y2<< "!";
-        //memcpy(y2, ret_y2, strlen(ret_y2));
+        module_xxx_funxxx_handle(_x, &ret_y);
+        methodError = ModuleXXX::stdErrorTypeEnum::NO_FAULT;
     }
     else
     {
-
+        std::cout << "funxxx call failed" <<"'\n";
     }
 
-    _reply(methodError, y1, y2);
+    _reply(methodError, ret_y);
 }
 
 std::shared_ptr<CommonAPI::Runtime> runtime;
@@ -100,12 +120,13 @@ int module_xxx_register_server(void)
 
     std::string domain = "local";
     std::string instance = "commonapi.examples.ModuleXXX";
-    std::string connection = "service-sample";
+    std::string connection = "ModuleXXX_Service";
 
     myService = std::make_shared<ModuleXXXStubImpl>();
     bool successfullyRegistered = runtime->registerService(domain, instance, myService, connection);
 
-    while (!successfullyRegistered) {
+    while (!successfullyRegistered) 
+    {
         std::cout << "Register Service failed, trying again in 100 milliseconds..." << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         successfullyRegistered = runtime->registerService(domain, instance, myService, connection);
@@ -121,6 +142,12 @@ int module_xxx_sayHello_callback_register(module_xxx_sayHello_cb_f sayHello_fun_
     return 0;
 }
 
+int module_xxx_fun_array_test_callback_register(module_xxx_fun_array_test_cb_f fun_array_test_funptr)
+{
+    module_xxx_fun_array_test_handle = fun_array_test_funptr;
+    return 0;
+}
+
 int module_xxx_funxxx_callback_register(module_xxx_funxxx_cb_f funxxx_funptr)
 {
     module_xxx_funxxx_handle = funxxx_funptr;
@@ -130,7 +157,6 @@ int module_xxx_funxxx_callback_register(module_xxx_funxxx_cb_f funxxx_funptr)
 int module_xxx_evtxxx_broadcast(int cnt)
 {
     myService->fireMyStatusEvent((int32_t) cnt);
-    std::cout << "New counter value = " << cnt << "!" << std::endl;
-
+    //std::cout << "Server send broadcast = " << cnt << std::endl;
     return 0;
 }

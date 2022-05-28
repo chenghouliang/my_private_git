@@ -5,17 +5,17 @@
     {
         "level" : "debug",
         "console" : "true",
-        "file" : { "enable" : "true", "path" : "/var/log/ModuleXXXClient.log" },
+        "file" : { "enable" : "true", "path" : "/var/log/ModuleXXXClientModuleB.log" },
         "dlt" : "true"
     },
     "applications" :
     [
         {
-            "name" : "client-sample",
+            "name" : "ModuleXXX_Client_ModuleB",
             "id" : "0x1343"
         }
     ],
-    "routing" : "client-sample",
+    "routing" : "ModuleXXX_Client_ModuleB",
     "service-discovery" :
     {
         "enable" : "true",
