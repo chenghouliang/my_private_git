@@ -7,68 +7,37 @@ package commonapi.examples
 
 interface ModuleXXX {
     version { major 0 minor 1 }
-    array myArray of UInt8
-    attribute Int32 x
-    attribute ModuleXXXCommonTypes.a1Struct a1
 
-    method sayHello {
-        in {
-            String name
-        }
-        out {
-            String message
-        }
-    }
+    array U8Array of UInt8
     
-    method funxxx {
-        in {
-            Int32 x
-        }
-        out {
-            Int32 y
-        }
-        error stdErrorTypeEnum
-    }
-
-    method fun_array_test {
-        in {
-            myArray x_array
-        }
-        out {
-            myArray y_array
-        }
-        error stdErrorTypeEnum_array
-    }
-    
-    broadcast myStatus {
-        out {
-            Int32 myCurrentValue
-        }
-    }
-
-    enumeration stdErrorTypeEnum {
+    enumeration ErrCode {
         NO_FAULT
-        MY_FAULT
+        FAULT
     }
 
-    enumeration stdErrorTypeEnum_array {
-        NO_FAULT
-        MY_FAULT
-    }
-}
-
-
-typeCollection ModuleXXXCommonTypes {
-    version { major 0 minor 1 }
-    
-    struct a1Struct {
-        String s
-        a2Struct a2
+    method method_val_test {
+        in {
+            Int32 in_val
+        }
+        out {
+            Int32 out_val
+        }
+        error ErrCode
     }
 
-    struct a2Struct {
-        Int32 a
-        Boolean b
-        Double d
+    method method_array_test {
+        in {
+            U8Array in_array
+        }
+        out {
+            U8Array out_array
+        }
+        error ErrCode
+    }
+
+    broadcast broadcastStatus {
+        out {
+            Int32 value
+        }
     }
 }

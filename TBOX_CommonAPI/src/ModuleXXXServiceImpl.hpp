@@ -9,19 +9,16 @@
 #include <iostream>
 #include <string>
 #include <cstdint>
-#include <vector>
 
 #ifndef _WIN32
 #include <unistd.h>
 #endif
 
-typedef void (*module_xxx_sayHello_cb_f)(char *name, char *returnMessage);
-typedef void (*module_xxx_funxxx_cb_f)(int x, int *ret_y);
-typedef void (*module_xxx_fun_array_test_cb_f)(uint8_t *x, uint8_t *ret_y);
+typedef void (*module_xxx_method_val_test_cb_f)(int *in_val, int *out_val);
+typedef void (*module_xxx_method_array_test_cb_f)(uint8_t *in_array, uint8_t *out_array);
 extern int module_xxx_register_server(void);
-extern int module_xxx_sayHello_callback_register(module_xxx_sayHello_cb_f sayHello_fun_ptr);
-extern int module_xxx_funxxx_callback_register(module_xxx_funxxx_cb_f funxxx_funptr);
-extern int module_xxx_fun_array_test_callback_register(module_xxx_fun_array_test_cb_f fun_array_test_funptr);
+extern int module_xxx_method_val_test_callback_register(module_xxx_method_val_test_cb_f method_val_test_funptr);
+extern int module_xxx_method_array_test_callback_register(module_xxx_method_array_test_cb_f method_array_test_funptr);
 extern int module_xxx_evtxxx_broadcast(int cnt);
 
 #endif // ModuleXXX_SERVICEIMPL_HPP_

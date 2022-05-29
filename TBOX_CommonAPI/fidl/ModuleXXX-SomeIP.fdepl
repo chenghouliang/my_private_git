@@ -9,68 +9,20 @@ import "ModuleXXX.fidl"
 define org.genivi.commonapi.someip.deployment for interface commonapi.examples.ModuleXXX {
     SomeIpServiceID = 4660
 
-    attribute x {
-        SomeIpGetterID = 3000
-        SomeIpSetterID = 3001
-        SomeIpNotifierID = 33010
-        SomeIpNotifierEventGroups = { 33010 }
-
-        SomeIpAttributeReliable = true
-    }
-
-    attribute a1 {
-        SomeIpGetterID = 3002
-        SomeIpSetterID = 3003
-        SomeIpNotifierID = 33011
-        SomeIpNotifierEventGroups = { 33011 }
-
-        SomeIpAttributeReliable = true
-    }
-
-    method sayHello {
-        SomeIpMethodID = 30004
-        SomeIpReliable = true
-        
-        in {
-            name {
-                SomeIpStringEncoding = utf16le
-            }
-        }
-    }
-    
-    method funxxx {
+    method method_val_test {
         SomeIpMethodID = 30005
         SomeIpReliable = false
     }
 
-    method fun_array_test {
+    method method_array_test {
         SomeIpMethodID = 30006
         SomeIpReliable = false
     }
 
-    broadcast myStatus {
+    broadcast broadcastStatus {
         SomeIpEventID = 33012        
         SomeIpEventGroups = { 33012 }
-
-        out {
-        }
     }
-    
-    enumeration stdErrorTypeEnum {
-        NO_FAULT {
-        }
-        MY_FAULT {
-        }
-    }
-}
-
-define org.genivi.commonapi.someip.deployment for typeCollection commonapi.examples.ModuleXXXCommonTypes {
-    struct a1Struct {
-    }
-
-    struct a2Struct {
-    }
-
 }
 
 define org.genivi.commonapi.someip.deployment for provider as Service {

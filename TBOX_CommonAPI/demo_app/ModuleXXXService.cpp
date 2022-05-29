@@ -9,30 +9,22 @@
 #include "ModuleXXXServiceImpl.hpp"
 #include "string.h"
 
-void sayHello(char *name, char *returnMessage)
-{
-    memcpy((void *)returnMessage, (void *)name, strlen(name)+1);
-    //printf("server:%s->%s\n", name, returnMessage);
-}
-
-void fun_array_test(uint8_t *name, uint8_t *returnMessage)
+void method_array_test(uint8_t *name, uint8_t *returnMessage)
 {
     memcpy((void *)returnMessage, (void *)name, 100);
-    //printf("server:%s->%s\n", name, returnMessage);
 }
 
-void funxxx(int x, int *ret_y)
+void method_val_test(int *in_val, int *out_val)
 {
-    *ret_y = x*x;
+    *out_val = (*in_val)*(*in_val);
 }
 
 int main() 
 {
     static int cnt = 0;
     module_xxx_register_server();
-    module_xxx_sayHello_callback_register(sayHello);
-    module_xxx_funxxx_callback_register(funxxx);
-    module_xxx_fun_array_test_callback_register(fun_array_test);
+    module_xxx_method_val_test_callback_register(method_val_test);
+    module_xxx_method_array_test_callback_register(method_array_test);
     while (true) 
     {
         module_xxx_evtxxx_broadcast(cnt++);

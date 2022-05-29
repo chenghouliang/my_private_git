@@ -16,9 +16,8 @@
 
 using namespace v0_1::commonapi::examples;
 
-module_xxx_sayHello_cb_f module_xxx_sayHello_handle = NULL;
-module_xxx_funxxx_cb_f module_xxx_funxxx_handle = NULL;
-module_xxx_fun_array_test_cb_f module_xxx_fun_array_test_handle = NULL;
+module_xxx_method_val_test_cb_f module_xxx_method_val_test_handle = NULL;
+module_xxx_method_array_test_cb_f module_xxx_method_array_test_handle = NULL;
 
 class ModuleXXXStubImpl: public v0_1::commonapi::examples::ModuleXXXStubDefault 
 {
@@ -26,10 +25,8 @@ class ModuleXXXStubImpl: public v0_1::commonapi::examples::ModuleXXXStubDefault
         ModuleXXXStubImpl();
         virtual ~ModuleXXXStubImpl();
 
-        virtual void sayHello(const std::shared_ptr<CommonAPI::ClientId> _client, std::string _name, sayHelloReply_t _reply);
-        virtual void funxxx(const std::shared_ptr<CommonAPI::ClientId> _client, int32_t _x, funxxxReply_t _reply);
-        virtual void fun_array_test(const std::shared_ptr<CommonAPI::ClientId> _client, std::vector< uint8_t> _x, fun_array_testReply_t _reply);
-
+        virtual void method_val_test(const std::shared_ptr<CommonAPI::ClientId> _client, int32_t _in_val, method_val_testReply_t _reply);
+        virtual void method_array_test(const std::shared_ptr<CommonAPI::ClientId> _client, ModuleXXX::U8Array _in_array, method_array_testReply_t _reply);
 };
 
 ModuleXXXStubImpl::ModuleXXXStubImpl() {
@@ -38,42 +35,41 @@ ModuleXXXStubImpl::ModuleXXXStubImpl() {
 ModuleXXXStubImpl::~ModuleXXXStubImpl() {
 }
 
-void ModuleXXXStubImpl::sayHello(const std::shared_ptr<CommonAPI::ClientId> _client,
-        std::string _name, sayHelloReply_t _reply) 
+void ModuleXXXStubImpl::method_val_test(const std::shared_ptr<CommonAPI::ClientId> _client, 
+                int32_t _in_val, method_val_testReply_t _reply)
 {
-    std::stringstream messageStream;
+    ModuleXXX::ErrCode methodError = ModuleXXX::ErrCode::FAULT;
+    int32_t ret_y = 0;
 
-    if (module_xxx_sayHello_handle != NULL)
+    if (module_xxx_method_val_test_handle != NULL)
     {
-        char returnMessage[20];
-        char name[100];
-        strcpy(name, _name.c_str());
-        module_xxx_sayHello_handle(name, returnMessage);
-        messageStream << returnMessage;
+        module_xxx_method_val_test_handle(&_in_val, &ret_y);
+        methodError = ModuleXXX::ErrCode::NO_FAULT;
     }
     else
     {
-        std::cout << "sayHello call faile" <<"'\n";
+        std::cout << "method_val_test call failed" <<"'\n";
     }
-    _reply(messageStream.str());
+
+    _reply(methodError, ret_y);
 }
 
-void ModuleXXXStubImpl::fun_array_test(const std::shared_ptr<CommonAPI::ClientId> _client,
-                std::vector< uint8_t> _x, fun_array_testReply_t _reply) 
+void ModuleXXXStubImpl::method_array_test(const std::shared_ptr<CommonAPI::ClientId> _client,
+                ModuleXXX::U8Array _in_array, method_array_testReply_t _reply) 
 {
-    ModuleXXX::stdErrorTypeEnum_array methodError = ModuleXXX::stdErrorTypeEnum_array::MY_FAULT;
-    std::vector< uint8_t> ret_y(100);
+    ModuleXXX::ErrCode methodError = ModuleXXX::ErrCode::FAULT;
+    ModuleXXX::U8Array ret_y(100);
     uint8_t in_array[100], out_array[100];
     int i = 0;
-    if (module_xxx_fun_array_test_handle != NULL)
+    if (module_xxx_method_array_test_handle != NULL)
     {
         for(i = 0; i < 100; i++)
         {
-            in_array[i] = _x[i];
+            in_array[i] = _in_array[i];
         }
 
-        module_xxx_fun_array_test_handle(in_array, out_array);
-        methodError = ModuleXXX::stdErrorTypeEnum_array::NO_FAULT;
+        module_xxx_method_array_test_handle(in_array, out_array);
+        methodError = ModuleXXX::ErrCode::NO_FAULT;
 
         for(i = 0; i < 100; i++)
         {
@@ -82,26 +78,7 @@ void ModuleXXXStubImpl::fun_array_test(const std::shared_ptr<CommonAPI::ClientId
     }
     else
     {
-        std::cout << "fun_array_test call failed" <<"'\n";
-    }
-
-    _reply(methodError, ret_y);
-}
-
-void ModuleXXXStubImpl::funxxx(const std::shared_ptr<CommonAPI::ClientId> _client,
-                int32_t _x, funxxxReply_t _reply) 
-{
-    ModuleXXX::stdErrorTypeEnum methodError = ModuleXXX::stdErrorTypeEnum::MY_FAULT;
-    int32_t ret_y = 0;
-
-    if (module_xxx_funxxx_handle != NULL)
-    {
-        module_xxx_funxxx_handle(_x, &ret_y);
-        methodError = ModuleXXX::stdErrorTypeEnum::NO_FAULT;
-    }
-    else
-    {
-        std::cout << "funxxx call failed" <<"'\n";
+        std::cout << "method_array_test call failed" <<"'\n";
     }
 
     _reply(methodError, ret_y);
@@ -136,27 +113,20 @@ int module_xxx_register_server(void)
     return 0;
 }
 
-int module_xxx_sayHello_callback_register(module_xxx_sayHello_cb_f sayHello_fun_ptr)
+int module_xxx_method_array_test_callback_register(module_xxx_method_array_test_cb_f method_array_test_funptr)
 {
-    module_xxx_sayHello_handle = sayHello_fun_ptr;
+    module_xxx_method_array_test_handle = method_array_test_funptr;
     return 0;
 }
 
-int module_xxx_fun_array_test_callback_register(module_xxx_fun_array_test_cb_f fun_array_test_funptr)
+int module_xxx_method_val_test_callback_register(module_xxx_method_val_test_cb_f method_val_test_funptr)
 {
-    module_xxx_fun_array_test_handle = fun_array_test_funptr;
-    return 0;
-}
-
-int module_xxx_funxxx_callback_register(module_xxx_funxxx_cb_f funxxx_funptr)
-{
-    module_xxx_funxxx_handle = funxxx_funptr;
+    module_xxx_method_val_test_handle = method_val_test_funptr;
     return 0;
 }
 
 int module_xxx_evtxxx_broadcast(int cnt)
 {
-    myService->fireMyStatusEvent((int32_t) cnt);
-    //std::cout << "Server send broadcast = " << cnt << std::endl;
+    myService->fireBroadcastStatusEvent((int32_t) cnt);
     return 0;
 }
