@@ -1,7 +1,3 @@
-// Copyright (C) 2014-2019 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -10,9 +6,11 @@
 #endif
 
 #include <CommonAPI/CommonAPI.hpp>
-#include "ModuleXXXServiceImpl.hpp"
 #include <v0/commonapi/examples/ModuleXXXProxy.hpp>
 #include <v0/commonapi/examples/ModuleXXXStubDefault.hpp>
+
+typedef void (*module_xxx_method_val_test_cb_f)(int *in_val, int *out_val);
+typedef void (*module_xxx_method_array_test_cb_f)(uint8_t *in_array, uint8_t *out_array);
 
 using namespace v0_1::commonapi::examples;
 
@@ -55,7 +53,7 @@ void ModuleXXXStubImpl::method_val_test(const std::shared_ptr<CommonAPI::ClientI
 }
 
 void ModuleXXXStubImpl::method_array_test(const std::shared_ptr<CommonAPI::ClientId> _client,
-                ModuleXXX::U8Array _in_array, method_array_testReply_t _reply) 
+                ModuleXXX::U8Array _in_array, method_array_testReply_t _reply)
 {
     ModuleXXX::ErrCode methodError = ModuleXXX::ErrCode::FAULT;
     ModuleXXX::U8Array ret_y(100);
@@ -87,6 +85,7 @@ void ModuleXXXStubImpl::method_array_test(const std::shared_ptr<CommonAPI::Clien
 std::shared_ptr<CommonAPI::Runtime> runtime;
 std::shared_ptr<ModuleXXXStubImpl> myService;
 
+extern "C" int module_xxx_register_server(void);
 int module_xxx_register_server(void)
 {
     CommonAPI::Runtime::setProperty("LogContext", "ModuleXXXS");
@@ -113,18 +112,21 @@ int module_xxx_register_server(void)
     return 0;
 }
 
+extern "C" int module_xxx_method_array_test_callback_register(module_xxx_method_array_test_cb_f method_array_test_funptr);
 int module_xxx_method_array_test_callback_register(module_xxx_method_array_test_cb_f method_array_test_funptr)
 {
     module_xxx_method_array_test_handle = method_array_test_funptr;
     return 0;
 }
 
+extern "C" int module_xxx_method_val_test_callback_register(module_xxx_method_val_test_cb_f method_val_test_funptr);
 int module_xxx_method_val_test_callback_register(module_xxx_method_val_test_cb_f method_val_test_funptr)
 {
     module_xxx_method_val_test_handle = method_val_test_funptr;
     return 0;
 }
 
+extern "C" int module_xxx_evtxxx_broadcast(int cnt);
 int module_xxx_evtxxx_broadcast(int cnt)
 {
     myService->fireBroadcastStatusEvent((int32_t) cnt);

@@ -1,12 +1,4 @@
-// Copyright (C) 2014-2019 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-#include "ModuleXXXClientImpl.hpp"
-#include "string.h"
+#include "ModuleXXXClientImpl.h"
 
 void module_xxx_method_val_test_call_async_callback(uint8_t *err_code, int32_t *out_val)
 {

@@ -14,12 +14,15 @@ message(STATUS "USE_FILE is set to value: ${USE_FILE}")
 
 OPTION(USE_CONSOLE "Set to OFF to disable console logging" OFF )
 message(STATUS "USE_CONSOLE is set to value: ${USE_CONSOLE}")
-set(COMMONAPI_INCLUDE_DIRS "/home/chenghl/CommonAPI/capicxx-core-runtime/include")
-set(COMMONAPI_SOMEIP_INCLUDE_DIRS "/home/chenghl/CommonAPI/capicxx-someip-runtime/include")
+# set(CommonAPI_DIR "/home/chenghl/CommonAPI/capicxx-core-runtime/build")
+# set(COMMONAPI_INCLUDE_DIRS "/home/chenghl/CommonAPI/capicxx-core-runtime/include")
+# set(COMMONAPI_SOMEIP_INCLUDE_DIRS "/home/chenghl/CommonAPI/capicxx-someip-runtime/include")
+# set(VSOMEIP_INCLUDE_DIRS "/home/chenghl/CommonAPI/vsomeip/interface")
 #set(CMAKE_C_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-gcc")
 #set(CMAKE_CXX_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-g++")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wall -O0 -std=c++11 -D_GLIBCXX_USE_NANOSLEEP -DLINUX")
 
 IF(USE_FILE)
   add_definitions(-DUSE_FILE)
@@ -32,14 +35,6 @@ SET(MAX_LOG_LEVEL "DEBUG" CACHE STRING "maximum log level")
 message(STATUS "MAX_LOG_LEVEL is set to value: ${MAX_LOG_LEVEL}")
 add_definitions(-DCOMMONAPI_LOGLEVEL=COMMONAPI_LOGLEVEL_${MAX_LOG_LEVEL})
 
-if (MSVC)
-# Visual C++ is not always sure whether he is really C++
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_CRT_SECURE_NO_WARNINGS /EHsc /wd\\\"4503\\\"")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_CRT_SECURE_NO_WARNINGS /wd\\\"4503\\\"")
-else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wall -O0 -std=c++11 -D_GLIBCXX_USE_NANOSLEEP -DLINUX")
-endif()
-
 message(STATUS "Compiler options: ${CMAKE_CXX_FLAGS}") 
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -51,137 +46,59 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 OPTION(USE_INSTALLED_COMMONAPI "Set to OFF to use the local (build tree) version of CommonAPI" ON)
 message(STATUS "USE_INSTALLED_COMMONAPI is set to value: ${USE_INSTALLED_COMMONAPI}")
 
-if ("${USE_INSTALLED_COMMONAPI}" STREQUAL "ON")
-    FIND_PACKAGE(CommonAPI 3.2.0 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
-    #FIND_PACKAGE(CommonAPI-DBus 3.2.0 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
-else()
+# if ("${USE_INSTALLED_COMMONAPI}" STREQUAL "ON")
+#     FIND_PACKAGE(CommonAPI 3.2.0 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
+# else()
     FIND_PACKAGE(CommonAPI 3.2.0 REQUIRED CONFIG NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-    #FIND_PACKAGE(CommonAPI-DBus 3.2.0 REQUIRED CONFIG NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-endif()
+# endif()
 
-message(STATUS "CommonAPI_CONSIDERED_CONFIGS: ${CommonAPI_CONSIDERED_CONFIGS}")
-message(STATUS "COMMONAPI_INCLUDE_DIRS: ${COMMONAPI_INCLUDE_DIRS}")
-message(STATUS "CommonAPI-DBus_CONSIDERED_CONFIGS: ${CommonAPI-DBus_CONSIDERED_CONFIGS}")
-message(STATUS "COMMONAPI_DBUS_INCLUDE_DIRS: ${COMMONAPI_DBUS_INCLUDE_DIRS}")
+
 
 # CommonAPI
 include(FindPkgConfig)
 ###############################################################################
-
-include_directories(
-    src
-    src-gen
-    /home/chenghl/CommonAPI/capicxx-core-runtime/include
-    /home/chenghl/CommonAPI/capicxx-someip-runtime/include
-    /home/chenghl/CommonAPI/vsomeip/interface
-)
-link_directories(
-    /home/chenghl/CommonAPI/capicxx-core-runtime/build
-    /home/chenghl/CommonAPI/capicxx-someip-runtime/build
-    /home/chenghl/CommonAPI/vsomeip/build
-)
-
 # SOME/IP
 find_package (CommonAPI-SomeIP 3.2.0 REQUIRED)
 find_package (vsomeip3 3.1.20 REQUIRED)
-
-# Source Files
-set(PRJ_APP_PATH demo_app)
-set(PRJ_SRC_PATH src)
-set(PRJ_SRC_GEN_PATH src-gen)
-set(PRJ_SRC_GEN_COMMONAPI_PATH ${PRJ_SRC_GEN_PATH}/v0/commonapi/examples)
-set(PRJ_SRC_GEN_COMMONAPI_DBUS_PATH ${PRJ_SRC_GEN_PATH}/v0/commonapi/examples)
-set(PRJ_SRC_GEN_COMMONAPI_SOMEIP_PATH ${PRJ_SRC_GEN_PATH}/v0/commonapi/examples)
-
-set(PRJ_NAME_CLIENT ${PRJ_NAME}Client)
-set(PRJ_NAME_SERVICE ${PRJ_NAME}Service)
-set(PRJ_NAME_CLIENT_A ${PRJ_NAME_CLIENT}ModuleA)
-set(PRJ_NAME_CLIENT_B ${PRJ_NAME_CLIENT}ModuleB)
-# Application
-FILE(GLOB PRJ_PROXY_GEN_SRCS ${PRJ_SRC_GEN_COMMONAPI_PATH}/*.cpp)
-set(PRJ_CLIENT_SRCS_A ${PRJ_APP_PATH}/${PRJ_NAME_CLIENT_A}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-set(PRJ_CLIENT_SRCS_B ${PRJ_APP_PATH}/${PRJ_NAME_CLIENT_B}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-set(PRJ_SERVICE_SRCS ${PRJ_APP_PATH}/${PRJ_NAME_SERVICE}.cpp ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-
 # Boost
 find_package( Boost 1.54 COMPONENTS system thread log REQUIRED )
-include_directories( ${Boost_INCLUDE_DIR} )
-
-# DBus library
-#FILE(GLOB PRJ_DBUS_LIB_SRCS ${PRJ_SRC_GEN_COMMONAPI_DBUS_PATH}/*cpp)
-
-# SOME/IP library
-FILE(GLOB PRJ_SOMEIP_LIB_SRCS ${PRJ_SRC_GEN_COMMONAPI_SOMEIP_PATH}/*cpp)
-
-# Paths
-OPTION(USE_INSTALLED_DBUS "Set to OFF to use the local (patched) version of dbus" ON)
-message(STATUS "USE_INSTALLED_DBUS is set to value: ${USE_INSTALLED_DBUS}")
-
+message(STATUS "CommonAPI_CONSIDERED_CONFIGS: ${CommonAPI_CONSIDERED_CONFIGS}")
+message(STATUS "COMMONAPI_INCLUDE_DIRS: ${COMMONAPI_INCLUDE_DIRS}")
+message(STATUS "COMMONAPI_SOMEIP_INCLUDE_DIRS: ${COMMONAPI_SOMEIP_INCLUDE_DIRS}")
+message(STATUS "VSOMEIP_INCLUDE_DIRS: ${VSOMEIP_INCLUDE_DIRS}")
+message(STATUS "Boost_INCLUDE_DIR: ${Boost_INCLUDE_DIR}")
 include_directories(
-    src-gen/core
-    src-gen/dbus
-    src-gen/someip
+    src
+    src-gen
     ${COMMONAPI_INCLUDE_DIRS}
-    ${COMMONAPI_DBUS_INCLUDE_DIRS}
     ${COMMONAPI_SOMEIP_INCLUDE_DIRS}
-    ${DBus_INCLUDE_DIRS}
     ${VSOMEIP_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIR}
 )
 
-if ("${USE_INSTALLED_DBUS}" STREQUAL "ON")
+# /home/chenghl/CommonAPI/capicxx-core-runtime/build
+# /home/chenghl/CommonAPI/capicxx-someip-runtime/build
+# /home/chenghl/CommonAPI/vsomeip/build
+message(STATUS "COMMONAPI_LIBDIR: ${COMMONAPI_LIBDIR}")
+message(STATUS "COMMONAPI_SOMEIP_CMAKE_DIR: ${COMMONAPI_SOMEIP_CMAKE_DIR}")
+message(STATUS "Boost_LIBRARY_DIR: ${Boost_LIBRARY_DIR}")
 link_directories(
     ${COMMONAPI_LIBDIR}
-    ${COMMONAPI_DBUS_LIBDIR}
     ${COMMONAPI_SOMEIP_CMAKE_DIR}/build
     ${Boost_LIBRARY_DIR}
 )
-else()
-link_directories(
-    ${COMMONAPI_LIBDIR}
-    ${COMMONAPI_DBUS_LIBDIR}
-    ${COMMONAPI_SOMEIP_CMAKE_DIR}/build
-    ${DBus_INCLUDE_DIRS}/dbus/.libs
-    ${Boost_LIBRARY_DIR}
-)
-endif()
 
-if (MSVC)
-  set(LINK_LIBRARIES CommonAPI)
-else()
-  set(LINK_LIBRARIES -Wl,--as-needed CommonAPI)
-endif()
+# Source Files
+set(PRJ_SRC_PATH src)
+set(PRJ_NAME_CLIENT ${PRJ_NAME}Client)
+set(PRJ_NAME_SERVICE ${PRJ_NAME}Service)
+# Application
+FILE(GLOB PRJ_PROXY_GEN_SRCS src-gen/v0/commonapi/examples/*.cpp)
 
-# Build Client
-add_executable(${PRJ_NAME_CLIENT_A} ${PRJ_CLIENT_SRCS_A})
-#target_link_libraries(${PRJ_NAME_CLIENT_A} ${LINK_LIBRARIES})
-target_link_libraries(${PRJ_NAME_CLIENT_A} CommonAPI)
-target_link_libraries(${PRJ_NAME_CLIENT_A} CommonAPI-SomeIP)
-target_link_libraries(${PRJ_NAME_CLIENT_A} vsomeip3)
+set(LINK_LIBRARIES -Wl,--as-needed CommonAPI)
 
-# Build Client
-add_executable(${PRJ_NAME_CLIENT_B} ${PRJ_CLIENT_SRCS_B})
-#target_link_libraries(${PRJ_NAME_CLIENT_B} ${LINK_LIBRARIES})
-target_link_libraries(${PRJ_NAME_CLIENT_B} CommonAPI)
-target_link_libraries(${PRJ_NAME_CLIENT_B} CommonAPI-SomeIP)
-target_link_libraries(${PRJ_NAME_CLIENT_B} vsomeip3)
+add_library (${PRJ_NAME_CLIENT}If SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+target_link_libraries(${PRJ_NAME_CLIENT}If CommonAPI-SomeIP)
 
-# Build service
-add_executable(${PRJ_NAME_SERVICE} ${PRJ_SERVICE_SRCS})
-#target_link_libraries(${PRJ_NAME_SERVICE} ${LINK_LIBRARIES})
-target_link_libraries(${PRJ_NAME_SERVICE} CommonAPI)
-target_link_libraries(${PRJ_NAME_SERVICE} CommonAPI-SomeIP)
-target_link_libraries(${PRJ_NAME_SERVICE} vsomeip3)
-
-# Build DBus library
-#add_library (${PRJ_NAME}-dbus SHARED ${PRJ_DBUS_LIB_SRCS})
-#target_link_libraries(${PRJ_NAME}-dbus CommonAPI-DBus)
-
-# Build SOME/IP library
-#add_library (${PRJ_NAME}-someip SHARED ${PRJ_SOMEIP_LIB_SRCS})
-#target_link_libraries(${PRJ_NAME}-someip CommonAPI-SomeIP)
-
-#add_library (${PRJ_NAME_CLIENT}_api SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-#target_link_libraries(${PRJ_NAME_CLIENT} CommonAPI-SomeIP)
-
-#add_library (${PRJ_NAME_SERVICE}_api SHARED ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-#target_link_libraries(${PRJ_NAME_SERVICE} CommonAPI-SomeIP)
+add_library (${PRJ_NAME_SERVICE}If SHARED ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+target_link_libraries(${PRJ_NAME_SERVICE}If CommonAPI-SomeIP)

@@ -1,7 +1,3 @@
-// Copyright (C) 2014-2019 Bayerische Motoren Werke Aktiengesellschaft (BMW AG)
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -11,14 +7,19 @@
 
 #include <CommonAPI/CommonAPI.hpp>
 #include <v0/commonapi/examples/ModuleXXXProxy.hpp>
-#include "ModuleXXXClientImpl.hpp"
+
 using namespace v0::commonapi::examples;
 
 std::shared_ptr< CommonAPI::Runtime > runtime;
 std::shared_ptr<ModuleXXXProxy<>> myProxy;
 
+typedef void (*module_xxx_method_val_test_call_async_cb_f)(uint8_t *err_code, int32_t *out_val);
+typedef void (*module_xxx_evtxxx_subscribe_cb_f)(int32_t *out_val);
+
 module_xxx_method_val_test_call_async_cb_f module_xxx_method_val_test_call_async_cb_handle = NULL;
 module_xxx_evtxxx_subscribe_cb_f module_xxx_evtxxx_subscribe_cb_handle = NULL;
+
+extern "C" int module_xxx_register_client(char *client_name);
 int module_xxx_register_client(char *client_name)
 {
     CommonAPI::Runtime::setProperty("LogContext", "ModuleXXXC");
@@ -40,6 +41,7 @@ int module_xxx_register_client(char *client_name)
     return 0;
 }
 
+extern "C" int module_xxx_method_array_test_call(uint8_t *in_array, uint8_t *out_array);
 int module_xxx_method_array_test_call(uint8_t *in_array, uint8_t *out_array)
 {
     CommonAPI::CallStatus callStatus;
@@ -72,6 +74,7 @@ int module_xxx_method_array_test_call(uint8_t *in_array, uint8_t *out_array)
     return 0;
 }
 
+extern "C" int module_xxx_method_val_test_call(int *in_val, int *out_val);
 int module_xxx_method_val_test_call(int *in_val, int *out_val)
 {
     CommonAPI::CallStatus callStatus;
@@ -95,6 +98,7 @@ int module_xxx_method_val_test_call(int *in_val, int *out_val)
     return 0;
 }
 
+extern "C" int module_xxx_method_val_test_call_async_regiester_callback(module_xxx_method_val_test_call_async_cb_f cb);
 int module_xxx_method_val_test_call_async_regiester_callback(module_xxx_method_val_test_call_async_cb_f cb)
 {
     module_xxx_method_val_test_call_async_cb_handle = cb;
@@ -119,6 +123,7 @@ void method_val_test_recv_cb(const CommonAPI::CallStatus& callStatus,
     }
 }
 
+extern "C" int module_xxx_method_val_test_call_async(int *in_val);
 int module_xxx_method_val_test_call_async(int *in_val)
 {
     CommonAPI::CallStatus callStatus;
@@ -132,6 +137,7 @@ int module_xxx_method_val_test_call_async(int *in_val)
     return 0;
 }
 
+extern "C" int module_xxx_evtxxx_subscribe(module_xxx_evtxxx_subscribe_cb_f cb);
 int module_xxx_evtxxx_subscribe(module_xxx_evtxxx_subscribe_cb_f cb)
 {
     // Subscribe to broadcast
