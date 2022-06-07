@@ -1,5 +1,37 @@
 cmake_minimum_required(VERSION 2.8)
+######################################################################################################
+set(TARGET "PC")
 
+if("${TARGET}" STREQUAL "AG550")
+  set(TOOLCHAIN_DIR "/opt/AG55X/gcc-arm-8.2-2019.01-x86_64-arm-linux-gnueabi/bin")
+  set(CMAKE_C_COMPILER "${TOOLCHAIN_DIR}/arm-linux-gnueabihf-gcc")
+  set(CMAKE_CXX_COMPILER "${TOOLCHAIN_DIR}/arm-linux-gnueabihf-g++")
+  set(MYSYSROOT "/opt/AG55X/gcc-arm-8.2-2019.01-x86_64-arm-linux-gnueabi/sysroot")
+
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_FIND_ROOT_PATH "${MYSYSROOT}")
+
+  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+  set(BOOST_ROOT "/home/chenghl/AG550/boost_1_72_0/obj")
+  set(vsomeip3_DIR "/home/chenghl/AG550/vsomeip/build")
+  set(CommonAPI_DIR "/home/chenghl/AG550/capicxx-core-runtime/build")
+  set(CommonAPI-SomeIP_DIR "/home/chenghl/AG550/capicxx-someip-runtime/build")
+elseif("${TARGET}" STREQUAL "AG215S")
+  set(TOOLCHAIN_DIR "/opt/AG215X/toolchain/sysroots/x86_64-oesdk-linux/usr/bin/aarch64-oe-linux")
+  set(CMAKE_C_COMPILER "${TOOLCHAIN_DIR}/aarch64-oe-linux-gcc")
+  set(CMAKE_CXX_COMPILER "${TOOLCHAIN_DIR}/aarch64-oe-linux-g++")
+  set(MYSYSROOT "/opt/AG215X/toolchain/sysroots/aarch64-oe-linux")
+
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_FIND_ROOT_PATH "${MYSYSROOT}")
+endif()
+######################################################################################################
 set(PRJ_NAME ModuleXXX)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
@@ -8,8 +40,6 @@ message(STATUS "USE_FILE is set to value: ${USE_FILE}")
 
 OPTION(USE_CONSOLE "Set to OFF to disable console logging" OFF )
 message(STATUS "USE_CONSOLE is set to value: ${USE_CONSOLE}")
-#set(CMAKE_C_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-gcc")
-#set(CMAKE_CXX_COMPILER "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux/arm-oe-linux-g++")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -g -rdynamic -ldl")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
