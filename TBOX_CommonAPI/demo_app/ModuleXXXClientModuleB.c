@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "ModuleXXXClientImpl.h"
 
 void module_xxx_method_val_test_call_async_callback(uint8_t *err_code, int32_t *out_val)

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 ######################################################################################################
-set(TARGET "PC")
+set(TARGET "AG550")
 
 if("${TARGET}" STREQUAL "AG550")
   set(TOOLCHAIN_DIR "/opt/AG55X/gcc-arm-8.2-2019.01-x86_64-arm-linux-gnueabi/bin")
@@ -32,7 +32,7 @@ elseif("${TARGET}" STREQUAL "AG215S")
   set(CMAKE_FIND_ROOT_PATH "${MYSYSROOT}")
 
   set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-  set(BOOST_ROOT "/home/chenghl/AG215S/boost_1_72_0/obj")
+  set(BOOST_ROOT "/opt/AG215X/package/usr")
   set(vsomeip3_DIR "/home/chenghl/AG215S/vsomeip/build")
   set(CommonAPI_DIR "/home/chenghl/AG215S/capicxx-core-runtime/build")
   set(CommonAPI-SomeIP_DIR "/home/chenghl/AG215S/capicxx-someip-runtime/build")
@@ -56,8 +56,11 @@ OPTION(USE_CONSOLE "Set to OFF to disable console logging" OFF )
 message(STATUS "USE_CONSOLE is set to value: ${USE_CONSOLE}")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -g -rdynamic -ldl")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread -Wall -O0 -std=c11 -D_GLIBC_USE_NANOSLEEP -DLINUX")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wall -O0 -std=c++11 -D_GLIBCXX_USE_NANOSLEEP -DLINUX")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -rdynamic -ldl")
 
 IF(USE_FILE)
   add_definitions(-DUSE_FILE)
@@ -112,9 +115,15 @@ message(STATUS "COMMONAPI_SOMEIP_CMAKE_DIR: ${COMMONAPI_SOMEIP_CMAKE_DIR}")
 message(STATUS "Boost_LIBRARY_DIR: ${Boost_LIBRARY_DIR}")
 link_directories(
     ${COMMONAPI_LIBDIR}
-    ${COMMONAPI_SOMEIP_CMAKE_DIR}/build
+    ${COMMONAPI_SOMEIP_CMAKE_DIR}
     ${Boost_LIBRARY_DIR}
 )
+
+if (MSVC)
+ set(LINK_LIBRARIES CommonAPI)
+else()
+ set(LINK_LIBRARIES -Wl,--as-needed CommonAPI)
+endif()
 
 # Source Files
 set(PRJ_SRC_PATH src)
@@ -122,8 +131,6 @@ set(PRJ_NAME_CLIENT ${PRJ_NAME}Client)
 set(PRJ_NAME_SERVICE ${PRJ_NAME}Service)
 # Application
 FILE(GLOB PRJ_PROXY_GEN_SRCS src-gen/v0/commonapi/examples/*.cpp)
-
-set(LINK_LIBRARIES -Wl,--as-needed CommonAPI)
 
 add_library (${PRJ_NAME_CLIENT}If SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
 target_link_libraries(${PRJ_NAME_CLIENT}If CommonAPI-SomeIP)
