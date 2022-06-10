@@ -14,11 +14,12 @@ if("${TARGET}" STREQUAL "AG550")
   set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
   set(CMAKE_FIND_ROOT_PATH "${MYSYSROOT}")
 
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-  set(BOOST_ROOT "/home/chenghl/AG550/boost_1_72_0/obj")
-  set(vsomeip3_DIR "/home/chenghl/AG550/vsomeip/build")
-  set(CommonAPI_DIR "/home/chenghl/AG550/capicxx-core-runtime/build")
-  set(CommonAPI-SomeIP_DIR "/home/chenghl/AG550/capicxx-someip-runtime/build")
+  set(CORE_RUNTIME_INCLUDE_DIR "/home/chenghl/AG550/includeDirCommonAPI_AG550/capicxx-core-runtime")
+  set(SOMEIP_RUNTIME_INCLUDE_DIR "/home/chenghl/AG550/includeDirCommonAPI_AG550/capicxx-someip-runtime")
+  set(VSOMEIP_INCLUDE_DIR "/home/chenghl/AG550/includeDirCommonAPI_AG550/vsomeip")
+  set(BOOST_INCLUDE_DIR "/home/chenghl/AG550/includeDirCommonAPI_AG550/boost_1_72")
+  # set(COMMONAPI_LINK_DIR "/home/chenghl/AG550/libDirCommonAPI_AG550/commonapi")
+  set(BOOST_LINK_DIR "/home/chenghl/AG550/libDirCommonAPI_AG550/boost_1_72")
 elseif("${TARGET}" STREQUAL "AG215S")
   set(TOOLCHAIN_DIR "/opt/AG215X/toolchain/sysroots/x86_64-oesdk-linux/usr/bin/aarch64-oe-linux")
   set(CMAKE_C_COMPILER "${TOOLCHAIN_DIR}/aarch64-oe-linux-gcc")
@@ -30,17 +31,6 @@ elseif("${TARGET}" STREQUAL "AG215S")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
   set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
   set(CMAKE_FIND_ROOT_PATH "${MYSYSROOT}")
-
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-  set(BOOST_ROOT "/opt/AG215X/package/usr")
-  set(vsomeip3_DIR "/home/chenghl/AG215S/vsomeip/build")
-  set(CommonAPI_DIR "/home/chenghl/AG215S/capicxx-core-runtime/build")
-  set(CommonAPI-SomeIP_DIR "/home/chenghl/AG215S/capicxx-someip-runtime/build")
-else()
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-  set(vsomeip3_DIR "/home/chenghl/CommonAPI/vsomeip/build")
-  set(CommonAPI_DIR "/home/chenghl/CommonAPI/capicxx-core-runtime/build")
-  set(CommonAPI-SomeIP_DIR "/home/chenghl/CommonAPI/capicxx-someip-runtime/build")
 endif()
 ######################################################################################################
 set(PRJ_NAME ModuleXXX)
@@ -84,46 +74,19 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 OPTION(USE_INSTALLED_COMMONAPI "Set to OFF to use the local (build tree) version of CommonAPI" ON)
 message(STATUS "USE_INSTALLED_COMMONAPI is set to value: ${USE_INSTALLED_COMMONAPI}")
 
-if ("${USE_INSTALLED_COMMONAPI}" STREQUAL "ON")
-   FIND_PACKAGE(CommonAPI 3.2.0 REQUIRED CONFIG NO_CMAKE_PACKAGE_REGISTRY)
-else()
-  FIND_PACKAGE(CommonAPI 3.2.0 REQUIRED CONFIG NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
-endif()
-
-# CommonAPI
-include(FindPkgConfig)
-find_package (CommonAPI-SomeIP 3.2.0 REQUIRED)
-find_package (vsomeip3 3.1.20 REQUIRED)
-find_package( Boost 1.54 COMPONENTS system thread log REQUIRED )
-
-message(STATUS "CommonAPI_CONSIDERED_CONFIGS: ${CommonAPI_CONSIDERED_CONFIGS}")
-message(STATUS "COMMONAPI_INCLUDE_DIRS: ${COMMONAPI_INCLUDE_DIRS}")
-message(STATUS "COMMONAPI_SOMEIP_INCLUDE_DIRS: ${COMMONAPI_SOMEIP_INCLUDE_DIRS}")
-message(STATUS "VSOMEIP_INCLUDE_DIRS: ${VSOMEIP_INCLUDE_DIRS}")
-message(STATUS "Boost_INCLUDE_DIR: ${Boost_INCLUDE_DIR}")
 include_directories(
     src
     src-gen
-    ${COMMONAPI_INCLUDE_DIRS}
-    ${COMMONAPI_SOMEIP_INCLUDE_DIRS}
-    ${VSOMEIP_INCLUDE_DIRS}
-    ${Boost_INCLUDE_DIR}
+    ${BOOST_INCLUDE_DIR}
+    ${CORE_RUNTIME_INCLUDE_DIR}
+    ${SOMEIP_RUNTIME_INCLUDE_DIR}
+    ${VSOMEIP_INCLUDE_DIR}
 )
 
-message(STATUS "COMMONAPI_LIBDIR: ${COMMONAPI_LIBDIR}")
-message(STATUS "COMMONAPI_SOMEIP_CMAKE_DIR: ${COMMONAPI_SOMEIP_CMAKE_DIR}")
-message(STATUS "Boost_LIBRARY_DIR: ${Boost_LIBRARY_DIR}")
 link_directories(
-    ${COMMONAPI_LIBDIR}
-    ${COMMONAPI_SOMEIP_CMAKE_DIR}
-    ${Boost_LIBRARY_DIR}
+    ${BOOST_LINK_DIR}
+    # ${COMMONAPI_LINK_DIR}
 )
-
-if (MSVC)
- set(LINK_LIBRARIES CommonAPI)
-else()
- set(LINK_LIBRARIES -Wl,--as-needed CommonAPI)
-endif()
 
 # Source Files
 set(PRJ_SRC_PATH src)
@@ -132,8 +95,12 @@ set(PRJ_NAME_SERVICE ${PRJ_NAME}Service)
 # Application
 FILE(GLOB PRJ_PROXY_GEN_SRCS src-gen/v0/commonapi/examples/*.cpp)
 
-add_library (${PRJ_NAME_CLIENT}If SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-target_link_libraries(${PRJ_NAME_CLIENT}If CommonAPI-SomeIP)
+add_library(${PRJ_NAME_CLIENT}If SHARED  ${PRJ_SRC_PATH}/${PRJ_NAME_CLIENT}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+# target_link_libraries(${PRJ_NAME_CLIENT}If CommonAPI)
+# target_link_libraries(${PRJ_NAME_CLIENT}If CommonAPI-SomeIP)
+# target_link_libraries(${PRJ_NAME_CLIENT}If vsomeip3)
 
-add_library (${PRJ_NAME_SERVICE}If SHARED ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
-target_link_libraries(${PRJ_NAME_SERVICE}If CommonAPI-SomeIP)
+add_library(${PRJ_NAME_SERVICE}If SHARED ${PRJ_SRC_PATH}/${PRJ_NAME_SERVICE}Impl.cpp ${PRJ_PROXY_GEN_SRCS})
+# target_link_libraries(${PRJ_NAME_SERVICE}If CommonAPI)
+# target_link_libraries(${PRJ_NAME_SERVICE}If CommonAPI-SomeIP)
+# target_link_libraries(${PRJ_NAME_SERVICE}If vsomeip3)
