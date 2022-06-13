@@ -1,25 +1,24 @@
 cmake_minimum_required(VERSION 2.8)
+set(PRJ_NAME ModuleXXX)
+SET(CMAKE_SYSTEM_NAME Linux)
+project (ModuleXXX)
 ######################################################################################################
 set(TARGET "AG550")
 
 if("${TARGET}" STREQUAL "AG550")
-  set(TOOLCHAIN_DIR "/opt/AG55X/gcc-arm-8.2-2019.01-x86_64-arm-linux-gnueabi/bin")
-  set(CMAKE_C_COMPILER "${TOOLCHAIN_DIR}/arm-linux-gnueabihf-gcc")
-  set(CMAKE_CXX_COMPILER "${TOOLCHAIN_DIR}/arm-linux-gnueabihf-g++")
-  set(MYSYSROOT "/opt/AG55X/gcc-arm-8.2-2019.01-x86_64-arm-linux-gnueabi/sysroot")
+  set(TOOLCHAIN_DIR "/opt/AG55X/ql-ag550qcn-le20-gcc820-v1-toolchain/gcc/usr/bin/arm-oe-linux")
+  set(CMAKE_C_COMPILER "${TOOLCHAIN_DIR}/arm-oe-linux-gcc")
+  set(CMAKE_CXX_COMPILER "${TOOLCHAIN_DIR}/arm-oe-linux-g++")
+  set(MYSYSROOT "/opt/AG55X/ql-ol-extsdk-ag550qcnabr03a10m8g_ocpu/ql-sysroots")
 
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --sysroot=${MYSYSROOT} -march=armv7-a -mfpu=neon -mfloat-abi=hard" CACHE INTERNAL "" FORCE)
   set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=${MYSYSROOT}  -march=armv7-a -mfpu=neon -mfloat-abi=hard" CACHE INTERNAL "" FORCE)
   set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
   set(CMAKE_FIND_ROOT_PATH "${MYSYSROOT}")
-  
-  # set(CORE_RUNTIME_INCLUDE_DIR "/home/chenghl/AG550/includeDirCommonAPI_AG550/capicxx-core-runtime")
-  # set(SOMEIP_RUNTIME_INCLUDE_DIR "/home/chenghl/AG550/includeDirCommonAPI_AG550/capicxx-someip-runtime")
-  # set(VSOMEIP_INCLUDE_DIR "/home/chenghl/AG550/includeDirCommonAPI_AG550/vsomeip")
-  # set(BOOST_INCLUDE_DIR "/home/chenghl/AG550/includeDirCommonAPI_AG550/boost_1_72")
+
   set(COMMONAPI_LINK_DIR "/home/chenghl/AG550/libDirCommonAPI_AG550/commonapi")
-  # set(BOOST_LINK_DIR "/home/chenghl/AG550/libDirCommonAPI_AG550/boost_1_72")
+  set(BOOST_LINK_DIR "/home/chenghl/AG550/libDirCommonAPI_AG550/boost_1_72")
 elseif("${TARGET}" STREQUAL "AG215S")
   set(TOOLCHAIN_DIR "/opt/AG215X/toolchain/sysroots/x86_64-oesdk-linux/usr/bin/aarch64-oe-linux")
   set(CMAKE_C_COMPILER "${TOOLCHAIN_DIR}/aarch64-oe-linux-gcc")
@@ -31,11 +30,12 @@ elseif("${TARGET}" STREQUAL "AG215S")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
   set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} --sysroot=${MYSYSROOT}" CACHE INTERNAL "" FORCE)
   set(CMAKE_FIND_ROOT_PATH "${MYSYSROOT}")
+
+  set(COMMONAPI_LINK_DIR "/home/chenghl/AG215S/libDirCommonAPI_AG215S/commonapi")
+  set(BOOST_LINK_DIR "/home/chenghl/AG215S/libDirCommonAPI_AG215S/boost_1_72")
 endif()
 ######################################################################################################
-set(PRJ_NAME ModuleXXX)
-SET(CMAKE_SYSTEM_NAME Linux)
-project (ModuleXXX)
+
 # compiler/linker flags
 set(CMAKE_VERBOSE_MAKEFILE on)
 
@@ -46,8 +46,8 @@ OPTION(USE_CONSOLE "Set to OFF to disable console logging" OFF )
 message(STATUS "USE_CONSOLE is set to value: ${USE_CONSOLE}")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -g -rdynamic -ldl")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread -Wall -O0 -std=c11 -D_GLIBC_USE_NANOSLEEP -DLINUX")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -g -rdynamic -ldl")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LIBHEBI_CROSS_GCC_TOOLCHAIN_ARG}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -Wall -O0 -std=c++11 -D_GLIBCXX_USE_NANOSLEEP -DLINUX")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -rdynamic -ldl")
@@ -76,15 +76,11 @@ message(STATUS "USE_INSTALLED_COMMONAPI is set to value: ${USE_INSTALLED_COMMONA
 
 include_directories(
     ../src
-    # ${BOOST_INCLUDE_DIR}
-    # ${CORE_RUNTIME_INCLUDE_DIR}
-    # ${SOMEIP_RUNTIME_INCLUDE_DIR}
-    # ${VSOMEIP_INCLUDE_DIR}
 )
 
 link_directories(
     ../../build
-    # ${BOOST_LINK_DIR}
+    ${BOOST_LINK_DIR}
     ${COMMONAPI_LINK_DIR}
  )
 
@@ -98,6 +94,10 @@ add_executable(ModuleXXXClientModuleA ${PRJ_CLIENT_SRCS_A})
 target_link_libraries(ModuleXXXClientModuleA CommonAPI)
 target_link_libraries(ModuleXXXClientModuleA CommonAPI-SomeIP)
 target_link_libraries(ModuleXXXClientModuleA vsomeip3)
+target_link_libraries(ModuleXXXClientModuleA boost_system)
+target_link_libraries(ModuleXXXClientModuleA boost_thread)
+target_link_libraries(ModuleXXXClientModuleA boost_filesystem)
+target_link_libraries(ModuleXXXClientModuleA boost_atomic)
 target_link_libraries(ModuleXXXClientModuleA ModuleXXXClientIf)
 
 # Build Client
@@ -105,6 +105,10 @@ add_executable(ModuleXXXClientModuleB ${PRJ_CLIENT_SRCS_B})
 target_link_libraries(ModuleXXXClientModuleB CommonAPI)
 target_link_libraries(ModuleXXXClientModuleB CommonAPI-SomeIP)
 target_link_libraries(ModuleXXXClientModuleB vsomeip3)
+target_link_libraries(ModuleXXXClientModuleB boost_system)
+target_link_libraries(ModuleXXXClientModuleB boost_thread)
+target_link_libraries(ModuleXXXClientModuleB boost_filesystem)
+target_link_libraries(ModuleXXXClientModuleB boost_atomic)
 target_link_libraries(ModuleXXXClientModuleB ModuleXXXClientIf)
 
 # Build service
@@ -112,4 +116,8 @@ add_executable(ModuleXXXService ${PRJ_SERVICE_SRCS})
 target_link_libraries(ModuleXXXService CommonAPI)
 target_link_libraries(ModuleXXXService CommonAPI-SomeIP)
 target_link_libraries(ModuleXXXService vsomeip3)
+target_link_libraries(ModuleXXXService boost_system)
+target_link_libraries(ModuleXXXService boost_thread)
+target_link_libraries(ModuleXXXService boost_filesystem)
+target_link_libraries(ModuleXXXService boost_atomic)
 target_link_libraries(ModuleXXXService ModuleXXXServiceIf)
