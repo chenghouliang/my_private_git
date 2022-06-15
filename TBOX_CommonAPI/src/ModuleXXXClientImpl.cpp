@@ -30,7 +30,7 @@ int module_xxx_register_client(char *client_name)
 
     std::string domain = "local";
     std::string instance = "commonapi.examples.ModuleXXX";
-    std::string connection(client_name, 20);
+    std::string connection(client_name, strlen(client_name));
 
     myProxy = runtime->buildProxy<ModuleXXXProxy>(domain,instance, connection);
 

@@ -85,8 +85,8 @@ void ModuleXXXStubImpl::method_array_test(const std::shared_ptr<CommonAPI::Clien
 std::shared_ptr<CommonAPI::Runtime> runtime;
 std::shared_ptr<ModuleXXXStubImpl> myService;
 
-extern "C" int module_xxx_register_server(void);
-int module_xxx_register_server(void)
+extern "C" int module_xxx_register_server(char *server_name);
+int module_xxx_register_server(char *server_name)
 {
     CommonAPI::Runtime::setProperty("LogContext", "ModuleXXXS");
     CommonAPI::Runtime::setProperty("LogApplication", "ModuleXXXS");
@@ -96,7 +96,7 @@ int module_xxx_register_server(void)
 
     std::string domain = "local";
     std::string instance = "commonapi.examples.ModuleXXX";
-    std::string connection = "ModuleXXX_Service";
+    std::string connection(server_name, strlen(server_name));
 
     myService = std::make_shared<ModuleXXXStubImpl>();
     bool successfullyRegistered = runtime->registerService(domain, instance, myService, connection);
